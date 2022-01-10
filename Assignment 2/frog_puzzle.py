@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Mapping, Dict, Sequence, Iterable
 from rl.distribution import Categorical, FiniteDistribution, Constant, Distribution
 from rl.markov_process import FiniteMarkovProcess, NonTerminal, Terminal 
+import matplotlib.pyplot as plt
 
 
 @dataclass(frozen=True)
@@ -32,12 +33,28 @@ class FrogPuzzle(FiniteMarkovProcess[State]):
 
 		return d
 
+	def traces(self, start_state_distribution, num_traces = 100000):
+		num = 1
+		while True:
+			yield self.simulate(start_state_distribution)
+			num += 1
+
+			if num > num_traces:
+				break
+
 
 if __name__ == '__main__':
-	L = 3
+	L = 10
 	puzzle = FrogPuzzle(L)
-	print("Transition Map")
-	print("----------------")
-	print(puzzle)
+	# print("Transition Map")
+	# print("----------------")
+	# print(puzzle)
 
 	start_distribution = Constant(value = NonTerminal(State(position = 1)))
+	num_traces = 10000
+
+	outcomes = [len([i for i in trace]) for trace in puzzle.traces(start_distribution, num_traces)]
+	# print(outcomes)
+
+	plt.hist(outcomes)
+	plt.show()
