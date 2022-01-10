@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Mapping, Dict, Sequence, Iterable
 from rl.distribution import Categorical, FiniteDistribution, Constant, Distribution
 from rl.markov_process import FiniteMarkovProcess, NonTerminal, Terminal 
+import matplotlib.pyplot as plt
 
 
 @dataclass(frozen=True)
@@ -41,26 +42,13 @@ class SnakesAndLaddersMP(FiniteMarkovProcess[State]):
 
 		return d
 
-	# def simulate(self, start_state_distribution):
-	# 	state = start_state_distribution.sample()
-	# 	print(state)
-	# 	yield state
-
-	# 	while isinstance(state, NonTerminal):
-	# 		state = self.transition(state).sample()
-	# 		print(state)
-	# 		yield state
-
-	# 		if isinstance(state, Terminal):
-	# 			break
-
-	def traces(self, start_state_distribution, count = 2):
+	def traces(self, start_state_distribution, num_traces = 100000):
 		num = 1
 		while True:
 			yield self.simulate(start_state_distribution)
 			num += 1
 
-			if num > count:
+			if num > num_traces:
 				break
 
 
@@ -81,9 +69,16 @@ if __name__ == '__main__':
 
 
 	start_distribution = Constant(value = NonTerminal(State(position = 1)))
+	num_traces = 10000
 
-	outcomes = [[i for i in trace] for trace in game.traces(start_distribution, 10)]
-	for i, out in enumerate(outcomes):
-		print(f"Trace {i + 1}: Length of the game was {len(out)}")
+	outcomes = [len([i for i in trace]) for trace in game.traces(start_distribution, num_traces)]
+	
+	# plt.plot(range(1, num_traces + 1), outcomes)
+	plt.hist(outcomes)
+	plt.xlabel('Time to complete a game of SNakes and Ladders')
+	plt.ylabel('Frequency')
+	plt.title("Probability Distribution of the Time Taken to Finish Snakes and Ladders")
+
+	plt.show()
 
 
