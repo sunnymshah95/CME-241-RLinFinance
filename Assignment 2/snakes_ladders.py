@@ -22,11 +22,11 @@ class SnakesAndLaddersMP(FiniteMarkovProcess[State]):
 	def get_transition_map(self) -> Mapping[State, FiniteDistribution[State]]:
 		d : Dict[State, FiniteDistribution[State]] = {}
 
-		for i in range(1, 100):
+		for state in range(1, 100):
 			state_probs_map = {}
 			next_state = 0
 			
-			for j in range(i + 1, min(101, i + 7)):
+			for j in range(state + 1, min(101, state + 7)):
 				if j in self.from_to.keys():
 					next_state = self.from_to[j]
 				else:
@@ -34,23 +34,34 @@ class SnakesAndLaddersMP(FiniteMarkovProcess[State]):
 
 				state_probs_map[State(position = next_state)] = 1. / 6.
 
-			if i > 94:
-				state_probs_map[State(position = i)] = (i - 94.) / 6.
+			if state > 94:
+				state_probs_map[State(position = state)] = (state - 94.) / 6.
 
-			d[State(position = i)] = Categorical(state_probs_map)
+			d[State(position = state)] = Categorical(state_probs_map)
 
 		return d
 
-	def simulate(self, start_state_distribution):
-		state = start_state_distribution.sample()
-		print('hi')
-		print(state)
-		yield state
+	# def simulate(self, start_state_distribution):
+	# 	state = start_state_distribution.sample()
+	# 	print(state)
+	# 	yield state
 
-		while isinstance(state, NonTerminal):
-			print('hi')
-			state = self.transition(state).sample()
-			yield state
+	# 	while isinstance(state, NonTerminal):
+	# 		state = self.transition(state).sample()
+	# 		print(state)
+	# 		yield state
+
+	# 		if isinstance(state, Terminal):
+	# 			break
+
+	def traces(self, start_state_distribution, count = 2):
+		num = 1
+		while True:
+			yield self.simulate(start_state_distribution)
+			num += 1
+
+			if num > count:
+				break
 
 
 
@@ -61,7 +72,6 @@ if __name__ == '__main__':
 				   6, 26, 11, 53, 60, 24, 73, 75, 78]
 
 	from_to = {fr : to for fr, to in zip(changes_from, changes_to)}
-	# from_to = {fr : fr for fr in changes_from}
 	game = SnakesAndLaddersMP(from_to = from_to)
 
 	print("Generated the Markov Process")
@@ -72,16 +82,8 @@ if __name__ == '__main__':
 
 	start_distribution = Constant(value = NonTerminal(State(position = 1)))
 
-	tracer = game.traces(start_distribution)
-	print(f"tracer = {tracer}")
-	print(f"Next(tracer) = {next(tracer)}")
-	print(f"Next(next(tracer)) = {next(next(tracer))}")
-	print(f"Next(next(tracer)) = {next(next(tracer))}")
-	print(f"Next(next(tracer)) = {next(next(tracer))}")
-	mp = game.transition(state = NonTerminal(State(position = 1)))
-	# print(mp)
-	print(mp.sample())
-
-
+	outcomes = [[i for i in trace] for trace in game.traces(start_distribution, 10)]
+	for i, out in enumerate(outcomes):
+		print(f"Trace {i + 1}: Length of the game was {len(out)}")
 
 
