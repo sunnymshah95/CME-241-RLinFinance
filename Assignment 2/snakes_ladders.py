@@ -5,6 +5,7 @@ from typing import Mapping, Dict, Sequence, Iterable
 from rl.distribution import Categorical, FiniteDistribution, Constant, Distribution
 from rl.markov_process import FiniteMarkovProcess, NonTerminal, Terminal 
 import matplotlib.pyplot as plt
+import itertools
 
 
 @dataclass(frozen=True)
@@ -16,8 +17,8 @@ class State:
 class SnakesAndLaddersMP(FiniteMarkovProcess[State]):
 	def __init__(self, from_to : Mapping[State, State]):
 		self.from_to = from_to
-
 		super().__init__(self.get_transition_map())
+		print("Generated the Markov Process")
 
 
 	def get_transition_map(self) -> Mapping[State, FiniteDistribution[State]]:
@@ -42,15 +43,6 @@ class SnakesAndLaddersMP(FiniteMarkovProcess[State]):
 
 		return d
 
-	def traces(self, start_state_distribution, num_traces = 100000):
-		num = 1
-		while True:
-			yield self.simulate(start_state_distribution)
-			num += 1
-
-			if num > num_traces:
-				break
-
 
 
 if __name__ == '__main__':
@@ -62,18 +54,18 @@ if __name__ == '__main__':
 	from_to = {fr : to for fr, to in zip(changes_from, changes_to)}
 	game = SnakesAndLaddersMP(from_to = from_to)
 
-	print("Generated the Markov Process")
+	
 	# print("Transition Map")
 	# print("----------------")
 	# print(game)
 
 
 	start_distribution = Constant(value = NonTerminal(State(position = 1)))
-	num_traces = 10000
+	num_traces = 10
 
-	outcomes = [len([i for i in trace]) for trace in game.traces(start_distribution, num_traces)]
+	outcomes = [len([st for st in it]) for it in itertools.islice(game.traces(start_distribution), num_traces)]
+	print(outcomes)
 	
-	# plt.plot(range(1, num_traces + 1), outcomes)
 	plt.hist(outcomes)
 	plt.xlabel('Time to complete a game of SNakes and Ladders')
 	plt.ylabel('Frequency')
