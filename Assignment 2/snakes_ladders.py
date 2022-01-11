@@ -66,6 +66,7 @@ if __name__ == '__main__':
 	outcomes = [len([st for st in it]) for it in itertools.islice(game.traces(start_distribution), num_traces)]
 	print(outcomes)
 	
+	
 	plt.hist(outcomes)
 	plt.xlabel('Time to complete a game of SNakes and Ladders')
 	plt.ylabel('Frequency')
