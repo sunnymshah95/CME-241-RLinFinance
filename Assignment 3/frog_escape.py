@@ -40,7 +40,7 @@ class FrogEscape(FiniteMarkovDecisionProcess[Position, str]):
 
 			dict_A[(Position(position = state.position - 1), 0.0)] = state.position / self.length
 			if state.position + 1 == self.length: # if the frog escapes, reward = 1.0, else 0.0
-				dict_A[(Position(position = state.position + 1), 1.0)] = 1 - state.position / self.length
+				dict_A[(Position(position = self.length), 1.0)] = 1 - state.position / self.length
 
 			else:
 				dict_A[(Position(position = state.position + 1), 0.0)] = 1 - state.position / self.length
@@ -59,37 +59,46 @@ class FrogEscape(FiniteMarkovDecisionProcess[Position, str]):
 
 
 if __name__ == '__main__':
-	length = 9
-	puzzle : FiniteMarkovDecisionProcess[Position, str] = FrogEscape(length = length)
+	# now i plot the optimal escap-probability as a function of the states for n = 3, 6 and 9
+	lengths = range(3, 10, 3)
+	fig, axes = plt.subplots(len(lengths), figsize = (10, 7))
+	for j, length in enumerate(lengths):
+		puzzle : FiniteMarkovDecisionProcess[Position, str] = FrogEscape(length = length)
 
-	# print("MDP Transition Map")
-	# print("------------------")
-	# print(puzzle)
+		# generate all possible combinations of actions for a given position
+		outcomes = [[(pos, act) for act in ['A', 'B']] for pos in range(1, length)]
+		optimal_policy = None # will store the optimal policy
+		optimal_value = None # will store the optimal value function
+		max_val = - np.inf # will be used to find the optimal value function
 
+		# then form the cartesian product of all those lists
+		for i in itertools.product(*outcomes):
+			my_dict : Dict[Position, str] = {Position(position = pos) : act for pos, act in i}
+			policy : FiniteDeterministicPolicy[Position, str] = FiniteDeterministicPolicy(my_dict)
+			implied_mrp : FiniteMarkovRewardProcess[Position] = puzzle.apply_finite_policy(policy)
+			val = implied_mrp.get_value_function_vec(gamma = 1.0)
 
-	# generate all possible combinations of actions for a given position
-	outcomes = [[(pos, act) for act in ['A', 'B']] for pos in range(1, length)]
-	optimal_policy = None
-	optimal_value = None
-	max_val = - np.inf
+			# store the optimal policy
+			if np.linalg.norm(val, ord = 1) > max_val:
+				optimal_policy = my_dict
+				optimal_value = val
+				max_val = np.linalg.norm(val, ord = 1)
 
-	# then form the cartesian product of all those lists
-	for i in itertools.product(*outcomes):
-		# print({pos : act for pos, act in i}, end = ' ---> Val Func = ')
-		my_dict : Dict[Position, str] = {Position(position = pos) : act for pos, act in i}
-		policy : FiniteDeterministicPolicy[Position, str] = FiniteDeterministicPolicy(my_dict)
-		implied_mrp: FiniteMarkovRewardProcess[Position] = puzzle.apply_finite_policy(policy)
-		val = implied_mrp.get_value_function_vec(gamma = 1.0)
-		# print(val)
+		# plot the optimal escape-probabilities
+		optimal_value = [0.] + [i for i in optimal_value] + [1.0]
+		axes[j].plot(range(length + 1), optimal_value)
+		axes[j].scatter(range(length + 1), optimal_value)
 
-		# store the optimal policy
-		if np.linalg.norm(val, ord = 1) > max_val:
-			optimal_policy = my_dict
-			optimal_value = val
-			max_val = np.linalg.norm(val, ord = 1)
+		ax2 = axes[j].twinx()
+		policy = [0.0 if act == 'A' else 1.0 for act in optimal_policy.values()]
+		ax2.scatter(range(1, length), policy, color = 'black')
 
+		axes[j].set_title(f"Optimal escape-probability and action as a function of states for $n$ = {length}")
+		axes[j].set_xlabel("State")
+		axes[j].set_ylabel("Probability")
+		ax2.set_ylabel("Action")
+		axes[j].grid(alpha = 0.6, linestyle = ':')
 
+	fig.tight_layout()
+	plt.show()
 
-
-
-	print(f"The optimal policy is:\n{optimal_policy}")
