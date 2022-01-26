@@ -71,6 +71,7 @@ def using_value_iteration(length : int, TOLERANCE : float) -> float:
 	--------
 	@duration: the time it took to run the algorithm (in milliseconds)
 	'''
+	print(f"Running value iteration for length = {length}")
 	start_time = time()
 	frog_mdp : FiniteMarkovDecisionProcess[Position, str] = FrogEscape(length = length)
 	old_vf : Dict[Position, float] = {s: 0.0 for s in frog_mdp.non_terminal_states}
@@ -97,6 +98,7 @@ def using_policy_iteration(length : int, TOLERANCE : float) -> float:
 	--------
 	@duration: the time it took to run the algorithm (in milliseconds)
 	'''
+	print(f"Running policy iteration for length = {length}")
 	start_time = time()
 	frog_mdp : FiniteMarkovDecisionProcess[Position, str] = FrogEscape(length = length)
 	old_vf = {s: 0.0 for s in frog_mdp.non_terminal_states}
@@ -136,11 +138,14 @@ def done(v1 : Dict[Position, float], v2 : Dict[Position, float], tol : float):
 
 if __name__ == '__main__':
 	TOLERANCE = 1e-5
-	n_sim = 3 # number of simulations to run for finding average time
+	n_sim = 1 # number of simulations to run for finding average time
 	lengths = [10, 50, 100, 500] #, 1000, 5000, 10000, 50000]
 	value_times = [] # will store the average time for value iteration
 	policy_times = [] # will store the average time for policy iteration
 
+	# for each length, run n_sim number of simulations
+	# and then calculate the average time taken for
+	# the algorithm to converge
 	for length in lengths:
 		values_tmp = []
 		policy_tmp = []
@@ -151,6 +156,8 @@ if __name__ == '__main__':
 		value_times.append(np.mean(values_tmp))
 		policy_times.append(np.mean(policy_tmp))
 
+	# plotting the graph of the size of state space
+	# versus the time taken to run the algorithm!
 	plt.plot(lengths, value_times, label = 'Value Iteration')
 	plt.scatter(lengths, value_times)
 
