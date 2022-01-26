@@ -71,7 +71,6 @@ def using_value_iteration(length : int, TOLERANCE : float) -> float:
 	--------
 	@duration: the time it took to run the algorithm (in milliseconds)
 	'''
-	print(f"Running value iteration for length = {length}")
 	start_time = time()
 	frog_mdp : FiniteMarkovDecisionProcess[Position, str] = FrogEscape(length = length)
 	old_vf : Dict[Position, float] = {s: 0.0 for s in frog_mdp.non_terminal_states}
@@ -98,7 +97,6 @@ def using_policy_iteration(length : int, TOLERANCE : float) -> float:
 	--------
 	@duration: the time it took to run the algorithm (in milliseconds)
 	'''
-	print(f"Running policy iteration for length = {length}")
 	start_time = time()
 	frog_mdp : FiniteMarkovDecisionProcess[Position, str] = FrogEscape(length = length)
 	old_vf = {s: 0.0 for s in frog_mdp.non_terminal_states}
@@ -137,9 +135,9 @@ def done(v1 : Dict[Position, float], v2 : Dict[Position, float], tol : float):
 	return np.linalg.norm(array1 - array2, ord = np.inf) < tol
 
 if __name__ == '__main__':
-	TOLERANCE = 1e-5
-	n_sim = 1 # number of simulations to run for finding average time
-	lengths = [10, 50, 100, 500] #, 1000, 5000, 10000, 50000]
+	TOLERANCE = 1e-2
+	n_sim = 3 # number of simulations to run for finding average time
+	lengths = range(10, 151, 10)
 	value_times = [] # will store the average time for value iteration
 	policy_times = [] # will store the average time for policy iteration
 
@@ -149,6 +147,7 @@ if __name__ == '__main__':
 	for length in lengths:
 		values_tmp = []
 		policy_tmp = []
+
 		for _ in range(n_sim):
 			values_tmp.append(using_value_iteration(length, TOLERANCE))
 			policy_tmp.append(using_policy_iteration(length, TOLERANCE))
@@ -158,18 +157,24 @@ if __name__ == '__main__':
 
 	# plotting the graph of the size of state space
 	# versus the time taken to run the algorithm!
-	plt.plot(lengths, value_times, label = 'Value Iteration')
-	plt.scatter(lengths, value_times)
+	fig, ax1 = plt.subplots()
+	ax1.plot(lengths, value_times, label = 'Value Iteration', color = 'blue')
+	ax1.scatter(lengths, value_times, color = 'blue')
 
-	plt.plot(lengths, policy_times, label = 'Policy Iteration')
-	plt.scatter(lengths, policy_times)
+	ax2 = ax1.twinx()
 
-	plt.title(f"Convergence speed versus size of problem; num of simulations = {n_sim}")
-	plt.xlabel("Size of state space for MDP")
-	plt.ylabel("Time (milliseconds)")
+	ax2.plot(lengths, policy_times, label = 'Policy Iteration', color = 'red')
+	ax2.scatter(lengths, policy_times, color = 'red')
 
-	plt.legend()
+	fig.suptitle("Convergence speed versus size of problem")
+	ax1.set_xlabel("Size of state space of MDP, $n$")
+	ax1.set_ylabel("Time for Value Iteration  (ms)")
+	ax2.set_ylabel("Time for Policy Iteration (ms)")
+
+	ax1.legend(loc = 'upper left')
+	ax2.legend(loc = 'upper right')
 	plt.grid(alpha = 0.75, linestyle = ":")
 	plt.show()
+	# plt.savefig('complexity_graph.png')
 
 
