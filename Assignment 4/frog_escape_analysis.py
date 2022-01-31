@@ -136,8 +136,8 @@ def done(v1 : Dict[Position, float], v2 : Dict[Position, float], tol : float):
 
 if __name__ == '__main__':
 	TOLERANCE = 1e-2
-	n_sim = 3 # number of simulations to run for finding average time
-	lengths = range(10, 151, 10)
+	n_sim = 1 # number of simulations to run for finding average time
+	lengths = range(10, 51, 10)
 	value_times = [] # will store the average time for value iteration
 	policy_times = [] # will store the average time for policy iteration
 
