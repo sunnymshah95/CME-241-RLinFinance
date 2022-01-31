@@ -110,55 +110,55 @@ class TwoStoresInventoryControl(FiniteMarkovDecisionProcess[InventoryState, Tupl
         return d
 
 
-if __name__ == '__main__':
-    capacity_1 = 4
-    capacity_2 = 7
-    poisson_lambda_1 = 2.0
-    poisson_lambda_2 = 1.0
-    holding_cost_1 = 1.0
-    holding_cost_2 = 3.0
-    stockout_cost_1 = 10.0
-    stockout_cost_2 = 24.0
-    transport_cost_1 = 10.0
-    transport_cost_2 = 9.0
+# if __name__ == '__main__':
+#     capacity_1 = 2
+#     capacity_2 = 2
+#     poisson_lambda_1 = 2.0
+#     poisson_lambda_2 = 1.0
+#     holding_cost_1 = 1.0
+#     holding_cost_2 = 3.0
+#     stockout_cost_1 = 10.0
+#     stockout_cost_2 = 24.0
+#     transport_cost_1 = 10.0
+#     transport_cost_2 = 9.0
 
-    user_gamma = 0.9
+#     user_gamma = 0.9
 
-    si_mdp: FiniteMarkovDecisionProcess[InventoryState, int] =\
-        TwoStoresInventoryControl(
-            capacity_1=capacity_1,
-            capacity_2=capacity_2,
-            poisson_lambda_1=poisson_lambda_1,
-            poisson_lambda_2=poisson_lambda_2,
-            holding_cost_1=holding_cost_1,
-            holding_cost_2=holding_cost_2,
-            stockout_cost_1=stockout_cost_1,
-            stockout_cost_2=stockout_cost_2,
-            transport_cost_1=transport_cost_1,
-            transport_cost_2=transport_cost_2
-        )
+#     si_mdp: FiniteMarkovDecisionProcess[InventoryState, int] =\
+#         TwoStoresInventoryControl(
+#             capacity_1=capacity_1,
+#             capacity_2=capacity_2,
+#             poisson_lambda_1=poisson_lambda_1,
+#             poisson_lambda_2=poisson_lambda_2,
+#             holding_cost_1=holding_cost_1,
+#             holding_cost_2=holding_cost_2,
+#             stockout_cost_1=stockout_cost_1,
+#             stockout_cost_2=stockout_cost_2,
+#             transport_cost_1=transport_cost_1,
+#             transport_cost_2=transport_cost_2
+#         )
 
     # print("MDP Transition Map")
     # print("------------------")
     # print(si_mdp)
 
-    fdp: FiniteDeterministicPolicy[InventoryState, Tuple[int, int, int]] = \
-        FiniteDeterministicPolicy(
-            {InventoryState(alpha_1, beta_1, alpha_2, beta_2): (capacity_1 - (alpha_1 + beta_1), capacity_2 - (alpha_2 + beta_2), transfer)
-             for alpha_1 in range(capacity_1 + 1)
-             for beta_1 in range(capacity_1 + 1 - alpha_1)
-             for alpha_2 in range(capacity_2 + 1) 
-             for beta_2 in range(capacity_2 + 1 - alpha_2)
-             for transfer in range(-max(alpha_2, capacity_1 - alpha_1 - beta_1), min(alpha_1, capacity_2 - alpha_2 - beta_2) + 1)
-            }
-    )
+    # fdp: FiniteDeterministicPolicy[InventoryState, Tuple[int, int, int]] = \
+    #     FiniteDeterministicPolicy(
+    #         {InventoryState(alpha_1, beta_1, alpha_2, beta_2): (capacity_1 - (alpha_1 + beta_1), capacity_2 - (alpha_2 + beta_2), transfer)
+    #          for alpha_1 in range(capacity_1 + 1)
+    #          for beta_1 in range(capacity_1 + 1 - alpha_1)
+    #          for alpha_2 in range(capacity_2 + 1) 
+    #          for beta_2 in range(capacity_2 + 1 - alpha_2)
+    #          for transfer in range(-max(alpha_2, capacity_1 - alpha_1 - beta_1), min(alpha_1, capacity_2 - alpha_2 - beta_2) + 1)
+    #         }
+    # )
 
     # print("Deterministic Policy Map")
     # print("------------------------")
     # print(fdp)
 
-    implied_mrp: FiniteMarkovRewardProcess[InventoryState] =\
-        si_mdp.apply_finite_policy(fdp)
+    # implied_mrp: FiniteMarkovRewardProcess[InventoryState] =\
+    #     si_mdp.apply_finite_policy(fdp)
     # print("Implied MP Transition Map")
     # print("--------------")
     # print(FiniteMarkovProcess(
@@ -207,6 +207,3 @@ if __name__ == '__main__':
     # print("MDP Value Iteration Optimal Value Function and Optimal Policy")
     # print("--------------")
     # opt_vf_vi, opt_policy_vi = value_iteration_result(si_mdp, gamma=user_gamma)
-    # print(opt_vf_vi)
-    # print(opt_policy_vi)
-    # print()
