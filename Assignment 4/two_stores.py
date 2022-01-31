@@ -84,7 +84,8 @@ class TwoStoresInventoryControl(FiniteMarkovDecisionProcess[InventoryState, Tupl
                                     prob_2: float = 1 - self.demand_distribution_2.cdf(ip_2 - 1)
 
                                     K_1 = self.transport_cost_1 if order_1 == 0 or order_2 == 0 else 0.0
-                                    K_2 = self.transport_cost_2 if transfer == 0 else 0.0
+                                    K_1 = min(1, order_1) * self.transport_cost_1 + min(1, order_2) * self.transport_cost_1
+                                    K_2 = self.transport_cost_2 if transfer != 0 else 0.0
 
                                     for i in range(ip_1):
                                         for j in range(ip_2):
@@ -111,32 +112,32 @@ class TwoStoresInventoryControl(FiniteMarkovDecisionProcess[InventoryState, Tupl
 
 
 # if __name__ == '__main__':
-#     capacity_1 = 2
-#     capacity_2 = 2
-#     poisson_lambda_1 = 2.0
-#     poisson_lambda_2 = 1.0
-#     holding_cost_1 = 1.0
-#     holding_cost_2 = 3.0
-#     stockout_cost_1 = 10.0
-#     stockout_cost_2 = 24.0
-#     transport_cost_1 = 10.0
-#     transport_cost_2 = 9.0
+    # capacity_1 = 2
+    # capacity_2 = 2
+    # poisson_lambda_1 = 2.0
+    # poisson_lambda_2 = 1.0
+    # holding_cost_1 = 1.0
+    # holding_cost_2 = 3.0
+    # stockout_cost_1 = 10.0
+    # stockout_cost_2 = 24.0
+    # transport_cost_1 = 10.0
+    # transport_cost_2 = 9.0
 
-#     user_gamma = 0.9
+    # user_gamma = 0.9
 
-#     si_mdp: FiniteMarkovDecisionProcess[InventoryState, int] =\
-#         TwoStoresInventoryControl(
-#             capacity_1=capacity_1,
-#             capacity_2=capacity_2,
-#             poisson_lambda_1=poisson_lambda_1,
-#             poisson_lambda_2=poisson_lambda_2,
-#             holding_cost_1=holding_cost_1,
-#             holding_cost_2=holding_cost_2,
-#             stockout_cost_1=stockout_cost_1,
-#             stockout_cost_2=stockout_cost_2,
-#             transport_cost_1=transport_cost_1,
-#             transport_cost_2=transport_cost_2
-#         )
+    # si_mdp: FiniteMarkovDecisionProcess[InventoryState, int] =\
+    #     TwoStoresInventoryControl(
+    #         capacity_1=capacity_1,
+    #         capacity_2=capacity_2,
+    #         poisson_lambda_1=poisson_lambda_1,
+    #         poisson_lambda_2=poisson_lambda_2,
+    #         holding_cost_1=holding_cost_1,
+    #         holding_cost_2=holding_cost_2,
+    #         stockout_cost_1=stockout_cost_1,
+    #         stockout_cost_2=stockout_cost_2,
+    #         transport_cost_1=transport_cost_1,
+    #         transport_cost_2=transport_cost_2
+    #     )
 
     # print("MDP Transition Map")
     # print("------------------")
