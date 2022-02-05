@@ -1,5 +1,5 @@
 # Our PDFs are all generated
-*.pdf
+# *.pdf
 
 # Emacs files
 *~
