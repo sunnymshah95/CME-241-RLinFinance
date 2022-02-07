@@ -1,3 +1,5 @@
+import sys
+sys.path.append("../../../")
 from typing import Tuple, Mapping, Dict, Sequence, Iterable
 from rl.markov_decision_process import FiniteMarkovDecisionProcess
 from rl.dynamic_programming import value_iteration_result
